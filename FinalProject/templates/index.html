@@ -1,0 +1,71 @@
+ <!-- Use the Jinja syntax to expand on the layout.html basic site structure -->
+
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <!-- This is where the main section of the page will go -->
+    <!-- Did not need the action part as this is not redirecting to another page -->
+    <form id="choices" method="post">
+        {% for t in text %}
+        <div class="container p-5">
+            {{ t.post }}
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm p-1">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>A</b>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{t.optionA}}</p>
+                            <button class="btn btn-primary" id="select" name="selection" value="A" type="submit">Select</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm p-1">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>B</b>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{t.optionB}}</p>
+                            <button class="btn btn-danger" id="select" name="selection" value="B" type="submit">Select</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm p-1">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>C</b>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{t.optionC}}</p>
+                            <button class="btn btn-success" id="select" name="selection" value="C" type="submit">Select</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm p-1">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>D</b>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{t.optionD}}</p>
+                            <button class="btn btn-warning" id="select" name="selection" value="D" type="submit">Select</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+    <script src="/static/utilities.js"></script>
+    <script src="/static/selectionmessage.js"></script>
+{% endblock %}

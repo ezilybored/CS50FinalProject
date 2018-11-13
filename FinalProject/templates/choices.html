@@ -1,0 +1,41 @@
+ <!-- Use the Jinja syntax to expand on the layout.html basic site structure -->
+
+{% extends "layout.html" %}
+
+{% block title %}
+     <!-- The header of this page -->
+    choices
+{% endblock %}
+
+{% block main %}
+    <!-- This is where the main section of the page will go -->
+    <!-- Will definitely need pagination from Bootstrap here -->
+    <!-- Also an ability to search by date -->
+    <!-- Start off by showing the last 10 choices and then maybe scale up from there -->
+    <table class="table table-sm">
+    <!-- These are the table headers -->
+    <thead>
+        <!-- There is only one row of headers. (More could be added using <tr><tr/> again -->
+        <tr>
+            <th>Date</th>
+            <th>Choice</th>
+            <th>Choice text</th>
+        </tr>
+    </thead>
+
+    <!-- The main body of the table -->
+    <tbody>
+        <!-- The data from application.py needs to be fed in here. Store it as a variable called choices -->
+        <!-- Starts a for loop. Iterates through each value in the choices array passed in from application.py-->
+        {% for choice in choices %}
+        <!-- Creates a row -->
+        <tr>
+            <!-- Creates a data cell for each of these items from the SQL table -->
+            <td>{{ choice.date }}</td>
+            <td>{{ choice.choice }}</td>
+            <td>{{ choice.choiceText }}</td>
+        </tr>
+        {% endfor %} <!-- Ends the for loop -->
+    </tbody>
+</table>
+{% endblock %}
