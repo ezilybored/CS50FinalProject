@@ -13,6 +13,7 @@ main .form-control
     width: auto;
 }
 
+
 main
 {
     /* scroll horizontally as needed */
@@ -20,6 +21,31 @@ main
 
     /* center contents */
     text-align: center;
+
+}
+
+body {
+
+    background: url(images/topography.png);
+}
+
+.box {
+    background-color: white;
+    border-color: grey;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    margin: 5px;
+    text-align: center;
+}
+
+.smallbox {
+    max-width: 25%;
+    display: inline-block
+}
+
+.card {
+    margin-left: 10px;
 }
 
 main img
@@ -31,4 +57,20 @@ main img
 #feedback
 {
     color: red;
+}
+
+#postedit
+{
+    margin: 30px;
+}
+
+#dateselect
+{
+    margin-bottom: 10px;
+}
+
+#postid
+{
+    margin-bottom: 10px;
+    text-align: center;
 }

@@ -1,4 +1,4 @@
-// A basic on event function edited to use an ajaz request to check if the user has already chosen this week
+// A basic on event function edited to use an ajax request to check if the user has already chosen this week
 
 function selectionMessage(e){
     console.log('is this thing on?');
