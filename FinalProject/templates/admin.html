@@ -8,6 +8,23 @@
 
 {% block main %}
 
-    Eventually show a running total of the scores for the current week
-
+{% for t in text %}
+<div class="container p-5 box">
+    {{ t.post }}
+</div>
+{% endfor %}
+<div class ="container box smallbox">
+    <div>
+        A = {{ A }}
+    </div>
+    <div>
+        B = {{ B }}
+    </div>
+    <div>
+        C = {{ C }}
+    </div>
+    <div>
+        D = {{ D }}
+    </div>
+</div>
 {% endblock %}

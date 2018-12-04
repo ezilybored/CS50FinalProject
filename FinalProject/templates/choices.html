@@ -12,7 +12,8 @@
     <!-- Will definitely need pagination from Bootstrap here -->
     <!-- Also an ability to search by date -->
     <!-- Start off by showing the last 10 choices and then maybe scale up from there -->
-    <table class="table table-sm">
+<div class="box">
+<table class="table table-sm">
     <!-- These are the table headers -->
     <thead>
         <!-- There is only one row of headers. (More could be added using <tr><tr/> again -->
@@ -38,4 +39,6 @@
         {% endfor %} <!-- Ends the for loop -->
     </tbody>
 </table>
+</div>
+<script src="/static/socket.js"></script>
 {% endblock %}

@@ -1,28 +1,19 @@
- <!-- Use the Jinja syntax to expand on the layout.html basic site structure -->
-
 {% extends "layout.html" %}
 
 {% block title %}
-     <!-- The header of this page -->
     archive
 {% endblock %}
 
 {% block main %}
-    <!-- This is where the main section of the page will go -->
-    <!-- Will definitely need pagination from Bootstrap here -->
-    <!-- Also an ability to search by date -->
-    <!-- Could set up to just choose a date to display the post from then have a next and previous button to skip back and ahead -->
-    <!-- Use a drop down menu with the auto fill function like in mashup -->
-
 
 {% for post in posts %}
-<div class="container p-5">
+<div class="container p-5 box">
     {{ post.post }}
 </div>
 <div>
 <form action="/changePost"method="post">
-    <button class="btn btn-primary"  name="Next" value="{{ post.id }}" type="submit">Next</button>
-    <button class="btn btn-primary"  name="Previous" value="{{ post.id }}" type="submit">Previous</button>
+    <button class="btn btn-secondary"  name="Next" value="{{ post.id }}" type="submit">Next</button>
+    <button class="btn btn-secondary"  name="Previous" value="{{ post.id }}" type="submit">Previous</button>
 </form>
 </div>
 {% endfor %}

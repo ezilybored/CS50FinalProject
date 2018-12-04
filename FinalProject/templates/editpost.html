@@ -1,0 +1,38 @@
+ <!-- Use the Jinja syntax to expand on the layout.html basic site structure -->
+
+{% extends "layout.html" %}
+
+{% block title %}
+    Edit Post
+{% endblock %}
+
+{% block main %}
+    <!-- This is where the main section of the page will go -->
+    <!-- A drop down menu to select the date to edit -->
+    <!-- An expandable text box to hold and edit the post -->
+    <!-- A submit button -->
+    <!-- A javascript check to make sure they do want to submit -->
+    <div id ="dateselect">
+        Select the date of the post to edit:
+    </div>
+    <form id="enterdate" method="post">
+        <div class="form-group">
+            <input id ="dateofpost" autocomplete="off" input class="form-control" name="postdate" type="date" required/>
+        </div>
+        <div>
+            <button class="btn btn-secondary" id="submitdate" name="submitdate">Submit date</button>
+        </div>
+    </form>
+    <form id="editpost" action="/updateposts" method="post">
+        <div class="input-group">
+             <textarea class="form-control" id="postedit" name="postedit" rows="20">This is where the text of the  post will show...</textarea>
+        </div>
+        <div class="form-group">
+             <textarea  input class="form-control" id="postid" name="postid" rows="1">Post ID</textarea>
+        </div>
+        <div>
+            <button class="btn btn-secondary" id="submitedit" name="submitedit" type="submit">Submit edit</button>
+        </div>
+    </form>
+    <script src="/static/retrieveposts2.js"></script>
+{% endblock %}

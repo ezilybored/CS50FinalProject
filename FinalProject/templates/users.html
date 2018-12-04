@@ -12,6 +12,7 @@
     <!-- Each row will need a button to either remove or promote to admin -->
     <!-- Add a search bar so that a particular user can be searched for -->
 
+<div class="box">
 <table class="table table-hover">
     <thead>
         <tr>
@@ -39,9 +40,9 @@
                 <td> {{ user.twitter }}</td>
                 <td> {{ user.date_of_birth }}</td>
                 <td> {{ user.admin }}</td>
-                <td><button type="button" name="Demote" class="btn btn-primary">Promote</button></td>
-                <td><button type="button" name="Promote" class="btn btn-primary">Demote</button></td>
-                <td><button type="button" name="Demote" class="btn btn-primary">Delete</button></td>
+                <td><button type="button" name="Demote" class="btn btn-secondary">Promote</button></td>
+                <td><button type="button" name="Promote" class="btn btn-secondary">Demote</button></td>
+                <td><button type="button" name="Demote" class="btn btn-secondary">Delete</button></td>
             </form>
         </tr>
         {% endfor %}
@@ -49,8 +50,9 @@
 </table>
 <!-- Sends the last user id back to the server to get the next or previous 10 users-->
 <form action="/changeUser"method="post">
-    <button class="btn btn-primary"  name="Previous" value="{{ finalid }}" type="submit">Previous</button>
-    <button class="btn btn-primary"  name="Next" value="{{ finalid }}" type="submit">Next</button>
+    <button class="btn btn-secondary"  name="Previous" value="{{ finalid }}" type="submit">Previous</button>
+    <button class="btn btn-secondary"  name="Next" value="{{ finalid }}" type="submit">Next</button>
 </form>
+</div>
 
 {% endblock %}
