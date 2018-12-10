@@ -1,10 +1,10 @@
-#import os
-#import requests
+import os
+import requests
 
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
 from flask_session import Session
-#from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -17,8 +17,8 @@ from helpers import login_required
 # Configure application
 app = Flask(__name__)
 # Configures Socket I/
-#app.config['SECRET_KEY'] = 'secret!'
-#socketio = SocketIO(app)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -158,50 +158,80 @@ def index():
     postdate = datetime.strptime(topost[0]["date_of_post"], '%Y-%m-%d')
     daydifference = 7 - (current - postdate).days
 
+    return render_template("index.html", text=topost)
+
+
+@socketio.on("submit vote")
+def vote(data):
+    selection = data["selection"]
+    print("socket selection is: ")
+    print(selection)
+
     if not session["admin"]:
         topost = db.execute("SELECT * FROM posts ORDER BY id DESC LIMIT 1")
+        postid = topost[0]['id']
         selected = db.execute("SELECT selected FROM choices WHERE userid = :userid AND date = :date",
                                 userid=session["user_id"],
                                 date=topost[0]["date_of_post"])
 
-        if request.method == "POST":
-            if not selected and request.form.get("selection") == 'A':
-                db.execute("INSERT INTO choices (userid, choice, date, selected, choiceText) VALUES (:userid, :choice, :date, :selected, :choiceText)",
+        if not selected and selection == 'A':
+                db.execute("INSERT INTO choices (userid, choice, date, selected, choiceText, postid) VALUES (:userid, :choice, :date, :selected, :choiceText, :postid)",
                             userid=session["user_id"],
                             choice="A",
                             date=topost[0]["date_of_post"],
                             selected="true",
-                            choiceText=topost[0]["optionA"])
+                            choiceText=topost[0]["optionA"],
+                            postid=postid)
                 print("A")
-            elif not selected and request.form.get("selection") == 'B':
-                db.execute("INSERT INTO choices (userid, choice, date, selected, choiceText) VALUES (:userid, :choice, :date, :selected, :choiceText)",
+        elif not selected and selection == 'B':
+                db.execute("INSERT INTO choices (userid, choice, date, selected, choiceText, postid) VALUES (:userid, :choice, :date, :selected, :choiceText, :postid)",
                             userid=session["user_id"],
                             choice="B",
                             date=topost[0]["date_of_post"],
                             selected="true",
-                            choiceText=topost[0]["optionB"])
+                            choiceText=topost[0]["optionB"],
+                            postid=postid)
                 print("B")
-            elif not selected and request.form.get("selection") == 'C':
-                db.execute("INSERT INTO choices (userid, choice, date, selected, choiceText) VALUES (:userid, :choice, :date, :selected, :choiceText)",
+        elif not selected and selection == 'C':
+                db.execute("INSERT INTO choices (userid, choice, date, selected, choiceText, postid) VALUES (:userid, :choice, :date, :selected, :choiceText, :postid)",
                             userid=session["user_id"],
                             choice="C",
                             date=topost[0]["date_of_post"],
                             selected="true",
-                            choiceText=topost[0]["optionC"])
+                            choiceText=topost[0]["optionC"],
+                            postid=postid)
                 print("C")
-            elif not selected and request.form.get("selection") == 'D':
-                db.execute("INSERT INTO choices (userid, choice, date, selected, choiceText) VALUES (:userid, :choice, :date, :selected, :choiceText)",
+        elif not selected and selection == 'D':
+                db.execute("INSERT INTO choices (userid, choice, date, selected, choiceText, postid) VALUES (:userid, :choice, :date, :selected, :choiceText, :postid)",
                             userid=session["user_id"],
                             choice="D",
                             date=topost[0]["date_of_post"],
                             selected="true",
-                            choiceText=topost[0]["optionD"])
+                            choiceText=topost[0]["optionD"],
+                            postid=postid)
                 print("D")
 
-        return render_template("index.html", text=topost)
 
-    else:
-        return render_template("index.html")
+    optionA = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice AND postid=:postid", choice = "A", postid = postid))
+    print(optionA)
+    optionB = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice AND postid=:postid", choice = "B", postid = postid))
+    print(optionB)
+    optionC = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice AND postid=:postid", choice = "C", postid = postid))
+    print(optionC)
+    optionD = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice AND postid=:postid", choice = "D", postid = postid))
+    print(optionD)
+
+    total = (optionA + optionB + optionC + optionD)
+    percentA = round(((optionA/total) * 100), 2)
+    percentB = round(((optionB/total) * 100), 2)
+    percentC = round(((optionC/total) * 100), 2)
+    percentD = round(((optionD/total) * 100), 2)
+
+    votes = {"A": percentA, "B": percentB, "C": percentC, "D": percentD}
+    jvotes = [percentA, percentB, percentC, percentD]
+
+    emit("vote totals", votes, broadcast=True)
+    emit("vote json", jvotes, broadcast=True)
 
 
 @app.route("/archive", methods=["GET", "POST"])
@@ -212,6 +242,31 @@ def archive():
     db.execute("UPDATE posts SET current_date = current_date")
     allposts = db.execute("SELECT * FROM posts ORDER BY id DESC LIMIT 2")
     return render_template("archive.html", posts=allposts[1:2])
+
+
+@app.route("/changePost", methods=["GET", "POST"])
+@login_required
+def changePost():
+
+    if request.form.get("Previous"):
+        prevpost = db.execute("SELECT * FROM posts WHERE id=:postid", postid=(int(request.form.get("Previous"))-1))
+
+        if not prevpost:
+            prevpost = db.execute("SELECT * FROM posts WHERE id=:postid", postid=(int(request.form.get("Previous"))))
+            return render_template("archive.html", posts=prevpost)
+
+        else:
+            return render_template("archive.html", posts=prevpost)
+
+    if request.form.get("Next"):
+        nextpost = db.execute("SELECT * FROM posts WHERE id=:postid", postid=(int(request.form.get("Next"))+1))
+
+        if not nextpost:
+            nextpost = db.execute("SELECT * FROM posts WHERE id=:postid", postid=(int(request.form.get("Next"))))
+            return render_template("archive.html", posts=nextpost)
+
+        else:
+            return render_template("archive.html", posts=nextpost)
 
 
 @app.route("/choices")
@@ -234,9 +289,10 @@ def votecheck():
     """Allows the site to check if the user has posted yet this week via an AJAX request"""
 
     topost = db.execute("SELECT * FROM posts ORDER BY id DESC LIMIT 1")
-    selected = db.execute("SELECT selected FROM choices WHERE userid = :userid AND date = :date",
-                            userid=session["user_id"],
-                            date=topost[0]["date_of_post"])
+    postid = topost[0]['id']
+    selected = db.execute("SELECT selected FROM choices WHERE userid = :userid AND postid = :postid",
+                                userid=session["user_id"],
+                                postid=postid)
 
     if not selected:
         t = jsonify({"success": True})
@@ -255,17 +311,34 @@ def admin():
     """The admin home screen that shows a running tally of the totals for each post selection for the week"""
 
     topost = db.execute("SELECT * FROM posts ORDER BY id DESC LIMIT 1")
+    postid = topost[0]["id"]
+    print(postid)
 
-    optionA = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice", choice = "A"))
+    optionA = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice AND postid=:postid", choice = "A", postid = postid))
     print(optionA)
-    optionB = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice", choice = "B"))
+    optionB = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice AND postid=:postid", choice = "B", postid = postid))
     print(optionB)
-    optionC = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice", choice = "C"))
+    optionC = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice AND postid=:postid", choice = "C", postid = postid))
     print(optionC)
-    optionD = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice", choice = "D"))
+    optionD = len(db.execute("SELECT * FROM CHOICES WHERE choice=:choice AND postid=:postid", choice = "D", postid = postid))
     print(optionD)
 
-    return render_template("admin.html", A=optionA, B=optionB, C=optionC, D=optionD, text=topost)
+    total = (optionA + optionB + optionC + optionD)
+    if total == 0:
+        percentA = 0;
+        percentB = 0;
+        percentC = 0;
+        percentD = 0;
+    else:
+        percentA = round(((optionA/total) * 100), 2)
+        percentB = round(((optionB/total) * 100), 2)
+        percentC = round(((optionC/total) * 100), 2)
+        percentD = round(((optionD/total) * 100), 2)
+
+    votes = {"A": percentA, "B": percentB, "C": percentC, "D": percentD}
+    jvotes = [percentA, percentB, percentC, percentD]
+
+    return render_template("admin.html", votes=votes, text=topost, jvotes=jvotes)
 
 
 @app.route("/users", methods=["GET", "POST"])
@@ -293,8 +366,13 @@ def changeUser():
     if request.form.get("Next"):
         nextusers = db.execute("SELECT * FROM users WHERE userid > :postid ORDER BY userid ASC LIMIT 10", postid=(int(request.form.get("Next"))))
 
+
         if not nextusers:
-            return render_template("error.html", error = ("You have gone too far. There are no more users"))
+            modulation = int(request.form.get("Next")) % 10
+            modulator = 10 - modulation
+            nextusers = db.execute("SELECT * FROM users WHERE userid > :postid ORDER BY userid ASC LIMIT :number", postid=(int(request.form.get("Next")))-10+modulator, number=modulation)
+            finalid = nextusers[len(nextusers)-1]["userid"]
+            return render_template("users.html", users=nextusers, finalid=finalid)
 
         else:
             finalid = nextusers[len(nextusers)-1]["userid"]
@@ -424,25 +502,4 @@ def updateposts():
     return render_template("editpost.html")
 
 
-@app.route("/changePost", methods=["GET", "POST"])
-@login_required
-def changePost():
-
-    if request.form.get("Previous"):
-        prevpost = db.execute("SELECT * FROM posts WHERE id=:postid", postid=(int(request.form.get("Previous"))-1))
-
-        if not prevpost:
-            return render_template("error.html", error = ("You have gone too far. There is no more story"))
-
-        else:
-            return render_template("archive.html", posts=prevpost)
-
-    if request.form.get("Next"):
-        nextpost = db.execute("SELECT * FROM posts WHERE id=:postid", postid=(int(request.form.get("Next"))+1))
-
-        if not nextpost:
-            return render_template("error.html", error = ("You have gone too far. There is no more story"))
-
-        else:
-            return render_template("archive.html", posts=nextpost)
 
