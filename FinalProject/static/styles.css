@@ -1,7 +1,7 @@
 nav .navbar-brand
 {
     /* size for brand */
-    font-size: xx-large;
+    font-size: x-large;
 }
 
 main .form-control
@@ -40,6 +40,7 @@ body {
 }
 
 .smallbox {
+    padding: 15px;
     max-width: 25%;
     display: inline-block
 }
@@ -73,4 +74,20 @@ main img
 {
     margin-bottom: 10px;
     text-align: center;
+}
+
+#barchart {
+    width: 800px;
+    height: 400px;
+    background-color: white;
+    margin: 10px auto;
+    border-color: grey;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+}
+
+.vote {
+    text-align: left;
+    padding-left: 30px;
 }

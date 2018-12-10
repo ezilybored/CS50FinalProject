@@ -1,4 +1,4 @@
-// A basic on event function edited to use an ajax request to check if the user has already chosen this week
+
 
 function selectionMessage(e){
     console.log('is this thing on?');
@@ -28,6 +28,7 @@ function selectionMessage(e){
         }
     };
 }
+
 
 // Adds an event listener to each of the buttons
 var pressedButton = document.getElementsByTagName('Button');
